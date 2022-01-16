@@ -37,7 +37,7 @@ func main() {
 	root, _ := filepath.Abs(flag.Arg(0))
 	addr := net.JoinHostPort(host, port)
 	fs := Compose(http.FileServer(http.Dir(root)), []Middleware{LogRequest})
-	api := Compose(APIServer(), []Middleware{JsonResponse})
+	api := Compose(APIServer(), []Middleware{LogRequest, JsonResponse})
 	http.Handle("/", fs)
 	http.Handle("/_/", http.StripPrefix("/_", api))
 	printServerInfo(root)
