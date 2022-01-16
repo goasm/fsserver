@@ -1,7 +1,9 @@
 package main
 
 import (
+	"log"
 	"net"
+	"net/http"
 )
 
 // LocalIP returns the IP address of the localhost
@@ -20,4 +22,27 @@ func LocalIP() (string, error) {
 		return "", err
 	}
 	return ip, nil
+}
+
+type Middleware func(http.Handler) http.Handler
+
+func Compose(h http.Handler, mws []Middleware) http.Handler {
+	for i := 0; i < len(mws); i++ {
+		h = mws[i](h)
+	}
+	return h
+}
+
+func LogRequest(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		log.Printf("[%s] %s", r.Method, r.URL)
+		next.ServeHTTP(w, r)
+	})
+}
+
+func JsonResponse(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		next.ServeHTTP(w, r)
+	})
 }

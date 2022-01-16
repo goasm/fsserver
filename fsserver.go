@@ -15,8 +15,6 @@ var (
 	port string
 )
 
-type middleware func(http.Handler) http.Handler
-
 func init() {
 	flag.Usage = func() {
 		fmt.Fprintln(os.Stderr, "Usage: server [OPTION...] PATH")
@@ -24,27 +22,6 @@ func init() {
 	}
 	flag.StringVar(&host, "a", "0.0.0.0", "address to use")
 	flag.StringVar(&port, "p", "8080", "port to bind to")
-}
-
-func compose(h http.Handler, mws []middleware) http.Handler {
-	for i := 0; i < len(mws); i++ {
-		h = mws[i](h)
-	}
-	return h
-}
-
-func logRequest(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		log.Printf("[%s] %s", r.Method, r.URL)
-		next.ServeHTTP(w, r)
-	})
-}
-
-func jsonResponse(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		next.ServeHTTP(w, r)
-	})
 }
 
 func printServerInfo(root string) {
@@ -59,8 +36,8 @@ func main() {
 	flag.Parse()
 	root, _ := filepath.Abs(flag.Arg(0))
 	addr := net.JoinHostPort(host, port)
-	fs := compose(http.FileServer(http.Dir(root)), []middleware{logRequest})
-	api := compose(APIServer(), []middleware{jsonResponse})
+	fs := Compose(http.FileServer(http.Dir(root)), []Middleware{LogRequest})
+	api := Compose(APIServer(), []Middleware{JsonResponse})
 	http.Handle("/", fs)
 	http.Handle("/_/", http.StripPrefix("/_", api))
 	printServerInfo(root)
