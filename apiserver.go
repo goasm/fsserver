@@ -5,6 +5,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"path/filepath"
 )
 
 type Result struct {
@@ -15,13 +16,22 @@ type Result struct {
 func APIServer() http.Handler {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/upload", func(w http.ResponseWriter, r *http.Request) {
-		file, _, err := r.FormFile("file")
 		result := Result{}
+		cwd := r.FormValue("cwd")
+		name := r.FormValue("name")
+		file, _, err := r.FormFile("file")
+		// join destination file path
+		root, err := os.Getwd()
 		if err != nil {
 			result = Result{Success: false, Error: err.Error()}
 			return
 		}
-		dest, err := os.OpenFile("dest", os.O_WRONLY|os.O_CREATE, 0644)
+		destPath := filepath.Join(root, cwd, name)
+		if err != nil {
+			result = Result{Success: false, Error: err.Error()}
+			return
+		}
+		dest, err := os.OpenFile(destPath, os.O_WRONLY|os.O_CREATE, 0644)
 		if err != nil {
 			result = Result{Success: false, Error: err.Error()}
 			return

@@ -29,8 +29,17 @@
         });
       });
 
+      function cwd() {
+        const path = location.pathname;
+        const pos = path.lastIndexOf('/');
+        const res = path.substring(1, pos);
+        return res;
+      }
+
       function uploadFile(file) {
         const data = new FormData();
+        data.append('cwd', cwd());
+        data.append('name', file.name);
         data.append('file', file);
         return fetch('/_/upload', {
           method: 'POST',
