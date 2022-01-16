@@ -5,13 +5,10 @@ import (
 	"net/http"
 )
 
-type APIHandler struct {
-}
-
-func APIServer() APIHandler {
-	return APIHandler{}
-}
-
-func (h APIHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	fmt.Print(r.URL)
+func APIServer() http.Handler {
+	mux := http.NewServeMux()
+	mux.HandleFunc("/upload", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Print("2 ", r.URL)
+	})
+	return mux
 }

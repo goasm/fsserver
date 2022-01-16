@@ -55,7 +55,7 @@ func main() {
 	fs := compose(http.FileServer(http.Dir(root)), []middleware{logRequest})
 	api := APIServer()
 	http.Handle("/", fs)
-	http.Handle("/_/", http.StripPrefix("/_/", api))
+	http.Handle("/_/", http.StripPrefix("/_", api))
 	printServerInfo(root)
 	log.Fatal(http.ListenAndServe(addr, nil))
 }
