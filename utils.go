@@ -35,7 +35,7 @@ func Compose(h http.Handler, mws []Middleware) http.Handler {
 
 func LogRequest(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		log.Printf("[%s] %s", r.Method, r.URL)
+		log.Printf("[%s] %s", r.Method, r.RequestURI)
 		next.ServeHTTP(w, r)
 	})
 }
