@@ -1,14 +1,18 @@
 package main
 
 import (
-	"fmt"
+	"encoding/json"
 	"net/http"
 )
+
+type Result struct {
+	Success bool `json:"success"`
+}
 
 func APIServer() http.Handler {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/upload", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Print("2 ", r.URL)
+		json.NewEncoder(w).Encode(Result{Success: true})
 	})
 	return mux
 }

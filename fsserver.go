@@ -40,6 +40,13 @@ func logRequest(next http.Handler) http.Handler {
 	})
 }
 
+func jsonResponse(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		next.ServeHTTP(w, r)
+	})
+}
+
 func printServerInfo(root string) {
 	fmt.Println("Serving path:", root)
 	ip, err := LocalIP()
@@ -53,7 +60,7 @@ func main() {
 	root, _ := filepath.Abs(flag.Arg(0))
 	addr := net.JoinHostPort(host, port)
 	fs := compose(http.FileServer(http.Dir(root)), []middleware{logRequest})
-	api := APIServer()
+	api := compose(APIServer(), []middleware{jsonResponse})
 	http.Handle("/", fs)
 	http.Handle("/_/", http.StripPrefix("/_", api))
 	printServerInfo(root)
