@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Post File</title>
+  <style>
+    .upload-zone {
+      background-color: lightgray;
+      width: 480px;
+      padding: 20px;
+      margin: 0 auto;
+    }
+  </style>
+</head>
+<body>
+  <div class="upload-zone">
+    <input id="upload" type="file" multiple />
+    <div class="result-message"></div>
+  </div>
+  <script>
+    (function() {
+      const upload = document.getElementById('upload');
+      upload.addEventListener('change', (e) => {
+        const files = upload.files;
+        const tasks = Array.from(files).map(uploadFile);
+        Promise.all(tasks).then((res) => {
+        }).catch((err) => {
+        });
+      });
+
+      function uploadFile(file) {
+        const data = new URLSearchParams();
+        data.append('file', file);
+        return fetch('/_/upload', {
+          method: 'POST',
+          body: data,
+        });
+      }
+    }());
+  </script>
+</body>
+</html>
