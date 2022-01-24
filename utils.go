@@ -1,9 +1,11 @@
 package main
 
 import (
+	"io"
 	"log"
 	"net"
 	"net/http"
+	"os"
 )
 
 // LocalIP returns the IP address of the localhost
@@ -22,6 +24,19 @@ func LocalIP() (string, error) {
 		return "", err
 	}
 	return ip, nil
+}
+
+func SaveFile(file io.Reader, destPath string) error {
+	dest, err := os.OpenFile(destPath, os.O_WRONLY|os.O_CREATE, 0644)
+	if err != nil {
+		return err
+	}
+	defer dest.Close()
+	_, err = io.Copy(dest, file)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 type Middleware func(http.Handler) http.Handler

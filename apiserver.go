@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"io"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -32,12 +31,7 @@ func APIServer() http.Handler {
 			return
 		}
 		destPath := filepath.Join(root, cwd, name)
-		dest, err := os.OpenFile(destPath, os.O_WRONLY|os.O_CREATE, 0644)
-		if err != nil {
-			result = Result{Success: false, Error: "failed to read file"}
-			return
-		}
-		_, err = io.Copy(dest, file)
+		err = SaveFile(file, destPath)
 		if err != nil {
 			result = Result{Success: false, Error: "failed to save file"}
 			return
