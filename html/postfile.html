@@ -11,16 +11,21 @@
       padding: 20px;
       margin: 0 auto;
     }
+    .result-message {
+      display: inline-block;
+      margin-left: 15px;
+    }
   </style>
 </head>
 <body>
   <div class="upload-zone">
     <input id="upload" type="file" multiple />
-    <div class="result-message"></div>
+    <div id="result" class="result-message"></div>
   </div>
   <script>
     (function() {
       const upload = document.getElementById('upload');
+      const result = document.getElementById('result');
       upload.addEventListener('change', (e) => {
         const files = upload.files;
         const tasks = Array.from(files).map(uploadFile);
@@ -44,6 +49,11 @@
         return request('/_/upload', {
           method: 'POST',
           body: data,
+          onProgress: (e) => {
+            const { loaded, total } = e;
+            const percent = loaded / total;
+            result.innerText = `${Math.round(percent * 100)}%`;
+          },
         });
       }
 
@@ -60,6 +70,7 @@
               }
             }
           };
+          req.onprogress = options.onProgress;
           req.onerror = reject;
           req.open(options.method, url);
           req.send(options.body);
