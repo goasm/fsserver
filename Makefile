@@ -6,5 +6,5 @@ OUTPUT_PATH := ./bin/fsserver
 default: build
 
 build:
-	go build $(BUILD_FLAGS) -o $(OUTPUT_PATH)
+	go build -o $(OUTPUT_PATH) $(BUILD_FLAGS) ./cmd/fsserver
 	@echo "Build done"
