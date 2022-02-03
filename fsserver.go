@@ -28,7 +28,7 @@ func printServerInfo(root string) {
 	fmt.Println("Serving path:", root)
 	ip, err := LocalIP()
 	if host == "0.0.0.0" && err == nil {
-		fmt.Println("Available on:", net.JoinHostPort(ip, port))
+		fmt.Println("Available on:", "http://"+net.JoinHostPort(ip, port))
 	}
 }
 
