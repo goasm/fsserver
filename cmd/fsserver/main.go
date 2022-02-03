@@ -8,6 +8,8 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+
+	fss "github.com/goasm/fsserver"
 )
 
 var (
@@ -26,7 +28,7 @@ func init() {
 
 func printServerInfo(root string) {
 	fmt.Println("Serving path:", root)
-	ip, err := LocalIP()
+	ip, err := fss.LocalIP()
 	if host == "0.0.0.0" && err == nil {
 		fmt.Println("Available on:", "http://"+net.JoinHostPort(ip, port))
 	}
@@ -36,8 +38,8 @@ func main() {
 	flag.Parse()
 	root, _ := filepath.Abs(flag.Arg(0))
 	addr := net.JoinHostPort(host, port)
-	fs := Compose(http.FileServer(http.Dir(root)), []Middleware{LogRequest})
-	api := Compose(APIServer(), []Middleware{LogRequest, JsonResponse})
+	fs := fss.Compose(http.FileServer(http.Dir(root)), []fss.Middleware{fss.LogRequest})
+	api := fss.Compose(fss.APIServer(), []fss.Middleware{fss.LogRequest, fss.JsonResponse})
 	http.Handle("/", fs)
 	http.Handle("/_/", http.StripPrefix("/_", api))
 	printServerInfo(root)
