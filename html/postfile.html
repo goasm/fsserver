@@ -12,8 +12,8 @@
       margin: 0 auto;
     }
     .result-message {
-      display: inline-block;
-      margin-left: 15px;
+      white-space: pre;
+      margin-top: 15px;
     }
   </style>
 </head>
@@ -21,17 +21,42 @@
   <div class="upload-zone">
     <input id="upload" type="file" multiple />
     <div id="result" class="result-message"></div>
+    <div id="error" class="error-message"></div>
   </div>
   <script>
     (function() {
       const upload = document.getElementById('upload');
       const result = document.getElementById('result');
+      const error = document.getElementById('error');
+
+      class State {
+        constructor(filenames) {
+          this.filenames = filenames;
+          this.progress = {};
+        }
+
+        update(filename, percent) {
+          this.progress[filename] = percent;
+        }
+
+        renderResult(element) {
+          const segs = this.filenames.map((filename) => {
+            const percent = this.progress[filename];
+            return `${filename} - ${Math.round(percent * 100)}%`;
+          });
+          element.innerText = segs.join('\n');
+        }
+      }
+
+      let state = null;
+
       upload.addEventListener('change', (e) => {
         const files = upload.files;
         const tasks = Array.from(files).map(uploadFile);
         Promise.all(tasks).then((res) => {
         }).catch((err) => {
         });
+        state = new State(Array.from(files).map(file => file.name));
       });
 
       function cwd() {
@@ -53,7 +78,8 @@
           onProgress: (e) => {
             const { loaded, total } = e;
             const percent = loaded / total;
-            result.innerText = `${Math.round(percent * 100)}%`;
+            state.update(file.name, percent);
+            state.renderResult(result);
           },
         });
       }

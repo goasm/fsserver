@@ -15,6 +15,7 @@ func FSServer(root string) http.Handler {
 
 type Result struct {
 	Success bool   `json:"success"`
+	File    string `json:"file,omitempty"`
 	Error   string `json:"error,omitempty"`
 }
 
@@ -52,4 +53,5 @@ func (s *fsServer) Post(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	result.Success = true
+	result.File = rel
 }
