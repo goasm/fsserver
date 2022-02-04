@@ -38,10 +38,8 @@ func main() {
 	flag.Parse()
 	root, _ := filepath.Abs(flag.Arg(0))
 	addr := net.JoinHostPort(host, port)
-	fs := fss.Compose(http.FileServer(http.Dir(root)), []fss.Middleware{fss.LogRequest})
-	api := fss.Compose(fss.APIServer(), []fss.Middleware{fss.LogRequest, fss.JsonResponse})
-	http.Handle("/", fs)
-	http.Handle("/_/", http.StripPrefix("/_", api))
+	server := fss.Compose(fss.FSServer(root), []fss.Middleware{fss.LogRequest, fss.JsonPostResponse})
+	http.Handle("/", server)
 	printServerInfo(root)
 	log.Fatal(http.ListenAndServe(addr, nil))
 }
