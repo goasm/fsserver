@@ -1,6 +1,8 @@
 package fsserver
 
 import (
+	"encoding/json"
+	"log"
 	"net/http"
 	"path"
 )
@@ -38,4 +40,16 @@ func (s *fsServer) Get(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *fsServer) Post(w http.ResponseWriter, r *http.Request) {
+	rel := r.URL.Path
+	abs := path.Join(s.root, rel)
+	result := Result{}
+	defer json.NewEncoder(w).Encode(result)
+	err := SaveFile(r.Body, abs)
+	if err != nil {
+		log.Printf("{error: SaveFile} %s", err.Error())
+		result.Success = false
+		result.Error = "failed to save file"
+		return
+	}
+	result.Success = true
 }
