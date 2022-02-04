@@ -56,8 +56,9 @@
         renderResult(element) {
           const tplt = '<table><tr><th>File</th><th>Progress</th></tr>{}</table>';
           const segs = this.filenames.map((filename) => {
-            const { link, percent } = this.progress[filename];
-            return `<tr><td>${filename}</td><td>${Math.round(percent * 100)}%</td></tr>`;
+            const { link, percent = 0 } = this.progress[filename] || {};
+            const title = link ? `<a href=${link} target="_blank">${filename}</a>` : filename;
+            return `<tr><td>${title}</td><td>${Math.round(percent * 100)}%</td></tr>`;
           });
           const hasResult = segs.length > 0;
           element.style.display = hasResult ? 'block' : 'none';
