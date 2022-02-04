@@ -37,18 +37,19 @@
       function cwd() {
         const path = location.pathname;
         const pos = path.lastIndexOf('/');
-        const res = path.substring(1, pos);
+        const res = path.substring(0, pos);
         return res;
       }
 
+      function join(...segs) {
+        return segs.join('/');
+      }
+
       function uploadFile(file) {
-        const data = new FormData();
-        data.append('cwd', cwd());
-        data.append('name', file.name);
-        data.append('file', file);
-        return request('/_/upload', {
+        const path = join(cwd(), file.name);
+        return request(path, {
           method: 'POST',
-          body: data,
+          body: file,
           onProgress: (e) => {
             const { loaded, total } = e;
             const percent = loaded / total;
