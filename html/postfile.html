@@ -15,6 +15,13 @@
       white-space: pre;
       margin-top: 15px;
     }
+    .result-message table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .result-message table tr > * {
+      border: 1px solid black;
+    }
     .error-message {
       color: orangered;
       white-space: pre;
@@ -41,21 +48,23 @@
           this.error = null;
         }
 
-        update(filename, percent) {
-          this.progress[filename] = percent;
+        update(filename, payload) {
+          const prev = this.progress[filename] || {};
+          this.progress[filename] = { ...prev, ...payload };
         }
 
         renderResult(element) {
+          const tplt = '<table><tr><th>File</th><th>Progress</th></tr>{}</table>';
           const segs = this.filenames.map((filename) => {
-            const percent = this.progress[filename];
-            return `${filename} - ${Math.round(percent * 100)}%`;
+            const { link, percent } = this.progress[filename];
+            return `<tr><td>${filename}</td><td>${Math.round(percent * 100)}%</td></tr>`;
           });
           const hasResult = segs.length > 0;
           element.style.display = hasResult ? 'block' : 'none';
           if (hasResult) {
-            element.innerText = segs.join('\n');
+            element.innerHTML = tplt.replace('{}', segs.join(''));
           } else {
-            element.innerText = '';
+            element.innerHTML = '';
           }
         }
 
@@ -101,15 +110,17 @@
           onProgress: (e) => {
             const { loaded, total } = e;
             const percent = loaded / total;
-            state.update(file.name, percent);
+            state.update(file.name, { percent });
             state.renderResult(result);
           },
         }).then((res) => {
-          const { success, error, file } = res;
+          const { success, error, file: link } = res;
           if (!success) {
             throw new Error(error);
           }
-          return file;
+          state.update(file.name, { link });
+          state.renderResult(result);
+          return link;
         });
       }
 
