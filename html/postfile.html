@@ -15,13 +15,18 @@
       white-space: pre;
       margin-top: 15px;
     }
+    .error-message {
+      color: orangered;
+      white-space: pre;
+      margin-top: 15px;
+    }
   </style>
 </head>
 <body>
   <div class="upload-zone">
     <input id="upload" type="file" multiple />
-    <div id="result" class="result-message"></div>
-    <div id="error" class="error-message"></div>
+    <div id="result" class="result-message" style="display: none;"></div>
+    <div id="error" class="error-message" style="display: none;"></div>
   </div>
   <script>
     (function() {
@@ -33,6 +38,7 @@
         constructor(filenames) {
           this.filenames = filenames;
           this.progress = {};
+          this.error = null;
         }
 
         update(filename, percent) {
@@ -44,7 +50,23 @@
             const percent = this.progress[filename];
             return `${filename} - ${Math.round(percent * 100)}%`;
           });
-          element.innerText = segs.join('\n');
+          const hasResult = segs.length > 0;
+          element.style.display = hasResult ? 'block' : 'none';
+          if (hasResult) {
+            element.innerText = segs.join('\n');
+          } else {
+            element.innerText = '';
+          }
+        }
+
+        renderError(element) {
+          const hasError = !!this.error;
+          element.style.display = hasError ? 'block' : 'none';
+          if (hasError) {
+            element.innerText = this.error.message;
+          } else {
+            element.innerText = '';
+          }
         }
       }
 
@@ -53,8 +75,9 @@
       upload.addEventListener('change', (e) => {
         const files = upload.files;
         const tasks = Array.from(files).map(uploadFile);
-        Promise.all(tasks).then((res) => {
-        }).catch((err) => {
+        Promise.all(tasks).catch((err) => {
+          state.error = err;
+          state.renderError(error);
         });
         state = new State(Array.from(files).map(file => file.name));
       });
@@ -81,6 +104,12 @@
             state.update(file.name, percent);
             state.renderResult(result);
           },
+        }).then((res) => {
+          const { success, error, file } = res;
+          if (!success) {
+            throw new Error(error);
+          }
+          return file;
         });
       }
 
