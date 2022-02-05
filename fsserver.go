@@ -43,7 +43,7 @@ func (s *fsServer) Get(w http.ResponseWriter, r *http.Request) {
 func (s *fsServer) Post(w http.ResponseWriter, r *http.Request) {
 	rel := r.URL.Path
 	abs := path.Join(s.root, rel)
-	result := Result{}
+	result := &Result{}
 	defer json.NewEncoder(w).Encode(result)
 	err := SaveFile(r.Body, abs)
 	if err != nil {
