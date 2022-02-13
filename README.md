@@ -1,6 +1,6 @@
 # fsserver
 
-[![Build Status](https://travis-ci.org/goasm/fsserver.svg?branch=master)](https://travis-ci.org/goasm/fsserver)
+[![Build Status](https://github.com/goasm/fsserver/actions/workflows/go.yml/badge.svg)](https://github.com/goasm/fsserver/actions/workflows/go.yml)
 
 fsserver is a command-line static HTTP server.
 
