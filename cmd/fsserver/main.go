@@ -19,7 +19,7 @@ var (
 
 func init() {
 	flag.Usage = func() {
-		fmt.Fprintln(os.Stderr, "Usage: server [OPTION...] PATH")
+		fmt.Fprintln(os.Stderr, "Usage: fsserver [OPTION...] PATH")
 		flag.PrintDefaults()
 	}
 	flag.StringVar(&host, "a", "0.0.0.0", "address to use")
